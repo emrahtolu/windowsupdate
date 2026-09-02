@@ -1,0 +1,26 @@
+# Visual Studio / .NET build output
+.vs/
+**/bin/
+**/obj/
+artifacts/
+*.user
+*.suo
+*.pdb
+
+# Downloaded update packages and generated output
+*.msu
+*.cab
+*.partial
+SU_*/
+Install-Updates*.ps1
+paket-manifest.csv
+
+# Local tooling and caches
+.dotnet/
+.nuget/
+build-appdata/
+net48/
+
+# Operating-system files
+Thumbs.db
+Desktop.ini
