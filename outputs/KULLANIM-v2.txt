@@ -1,0 +1,85 @@
+SERVER UPDATE PACKAGER v2
+=========================
+
+Geliştiren ve proje sahibi: @emrahtolu
+
+Amaç
+----
+Windows Server ve Windows 11 için x64 güncelleme paketlerini Microsoft Update
+Catalog'dan bulur, indirir ve hedefe göre PowerShell kurulum scripti üretir.
+
+Desteklenen hedefler
+--------------------
+- Windows Server 2016, 2019, 2022 ve 2025
+- Windows 11 23H2, 24H2, 25H2 ve 26H1
+
+Aylık paket kullanımı
+---------------------
+1. Server-Update-Packager-v2.exe dosyasını açın.
+2. Yıl, ay ve hedef sistemleri seçin.
+3. İsterseniz KB890830 ve "Ayrı SSU varsa ekle" seçeneklerini işaretleyin.
+4. "Aylık Paketleri Ara" düğmesine basın.
+5. Bulunan paketleri kontrol edip istemediklerinizin işaretini kaldırın.
+6. Yerel indirme klasörünü seçin.
+7. "Kurulum yolu" alanındaki DOSYA YOLUNU YAZIN metnini, paketlerin hedef
+   cihazlarca okunacağı gerçek yol ile değiştirin.
+8. "Seçilenleri İndir" düğmesine basın.
+9. Oluşan SU_YYYY_MM klasörünü hedef konuma aynı yapıyla kopyalayın.
+10. Install-Updates.ps1 dosyasını yetkili yönetim/dağıtım sistemiyle çalıştırın.
+
+Manuel KB araması
+-----------------
+Üstteki "Manuel KB" alanına KB5039212 gibi bir değer yazın ve
+"KB Ara ve Ekle" düğmesine basın. Catalog'daki x64 eşleşmeleri listeye eklenir;
+istenen paketler seçilerek indirilebilir.
+
+Manuel KB sonuçları hedef işletim sistemiyle kesin eşleştirilemediği için
+güvenlik amacıyla otomatik PowerShell kurulum scriptine eklenmez. Bu dosyalar
+"Manual KB" klasörüne indirilir ve SHA-256 manifestinde yer alır.
+
+SSU davranışı
+-------------
+"Ayrı SSU varsa ekle" seçildiğinde araç ilgili ay ve hedef için ayrı yayımlanmış
+x64 Servicing Stack Update paketini arar. Bulursa CU'dan önce sıralar. Microsoft
+yeni sürümlerde SSU'yu çoğunlukla LCU içine birleştirdiği için bazı hedeflerde
+"ayrı SSU yok" uyarısı normaldir.
+
+Oluşabilecek klasörler
+----------------------
+SU_YYYY_MM\
+  Server 2016\...
+  Server 2019\...
+  Server 2022\...
+  Server 2025\...
+  Windows 11 23H2\...
+  Windows 11 24H2\...
+  Windows 11 25H2\...
+  Windows 11 26H1\...
+  Common\windows-kb890830-...exe
+  Manual KB\...
+  Install-Updates.ps1
+  paket-manifest.csv
+
+Ağ erişimi
+----------
+Araç yalnız dışarı yönlü bağlantı kurar. Gelen bağlantı veya P2P portu gerekmez.
+
+- catalog.update.microsoft.com ve www.catalog.update.microsoft.com: TCP 443
+- *.dl.delivery.mp.microsoft.com: TCP 443, gerektiğinde TCP 80
+- download.windowsupdate.com ve *.download.windowsupdate.com: TCP 80 ve 443
+- Daha geniş Catalog kuralı gerekiyorsa *.update.microsoft.com: TCP 80 ve 443
+
+TLS 1.2, HTTP GET/POST, yönlendirmeler ve birkaç GB büyüklüğündeki dosyalar proxy
+üzerinde izinli olmalıdır. IP yerine FQDN kuralı kullanılması önerilir.
+
+Önemli notlar
+-------------
+- Kodda sabit kurum, domain, kullanıcı, kimlik bilgisi veya ağ paylaşım yolu yoktur.
+- Varsayılan script yolu yalnız DOSYA YOLUNU YAZIN metnidir.
+- Aylık aramada Preview, .NET, Dynamic Update, Safe OS ve Setup Dynamic sonuçları
+  otomatik olarak hariç tutulur.
+- Server 2025 ve desteklenen Windows 11 sürümleri için checkpoint MSU'ları doğru
+  sıraya yerleştirilir.
+- Manifest her indirilen dosyanın SHA-256 değerini ve Microsoft indirme adresini içerir.
+- Uygulama .NET Framework 4.8 kullanır ve kurulum gerektirmez.
+- EXE kod imzalı değildir. Genel/kurumsal dağıtımdan önce kod imzası önerilir.
